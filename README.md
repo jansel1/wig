@@ -12,6 +12,14 @@ Create modern loading screens for applications, programs, anything. Theres not m
 
     loadingScreen.ChangeCursor("tkinter-cursor") # Change cursor (must be a TKinter cursor)
     loadingScreen.Destroy() # Destroy window
+
+    # image argument example: "path/to/image.jpg"
+    # dimensions argument example: (800, 500) (X and Y)
+    # draggable argument example: true
+    # cursor argument example: "arrow"
+    # fadein argument example: true
+    # fadein_delayms example: 10
+    
 ```
 
 (image must be some sort of path e.g. 'path/to/image.jpeg')
