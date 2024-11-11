@@ -22,8 +22,9 @@ Create modern loading screens for applications, programs, anything. Theres not m
     
 ```
 
-(image must be some sort of path e.g. 'path/to/image.jpeg')
+You can also spam press control to exit the loading screen at any moment in case of failure. 
 
 ## Known Issues
 
-As of now, WIG can't handle more than one screen PER program.
+- As of now, WIG can't handle more than one screen PER program.
+
