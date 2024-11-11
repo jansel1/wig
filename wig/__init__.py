@@ -5,7 +5,7 @@ import time, threading, os
 sessions = []
 
 class _LoadingScreenVessel:
-    def __init__(self, image, dimensions=(500, 280), draggable=False, cursor="wait", 
+    def __init__(self, image, dimensions=(650, 390), draggable=False, cursor="wait", 
                     fadein=True, fadein_delayms=10):
 
         global sessions
@@ -35,7 +35,12 @@ class _LoadingScreenVessel:
             self.root.bind("<ButtonPress-1>", self.start_drag)
             self.root.bind("<B1-Motion>", self.do_drag)
 
-        image = Image.open(image)
+        try:
+            image = Image.open(image)
+        except:
+            os.chdir(os.path.dirname(os.path.abspath(__file__)))
+            image = Image.open("inf.jpg")
+        
         image = image.resize((dimensions[0], dimensions[1]))
 
         photo = ImageTk.PhotoImage(image)
@@ -75,7 +80,7 @@ class _LoadingScreenVessel:
 
 
 class AddLoadingScreen:
-    def __init__(self, image, dimensions=(500, 280), draggable=False, cursor="wait", 
+    def __init__(self, image, dimensions=(650, 390), draggable=False, cursor="wait", 
                 fadein=True, fadein_delayms=10):
 
         self.vessel = threading.Thread(target=lambda: _LoadingScreenVessel(image, dimensions, draggable, cursor, fadein=fadein, fadein_delayms=fadein_delayms))
