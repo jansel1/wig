@@ -4,11 +4,15 @@ import time, threading, os
 
 sessions = []
 
+screenWidth = None
+screenHeight = None
+screenCenter = None
+
 class _LoadingScreenVessel:
     def __init__(self, image, dimensions=(650, 390), draggable=False, cursor="wait", 
                     fadein=True, fadein_delayms=10):
 
-        global sessions
+        global sessions, screenWidth, screenHeight, screenCenter
 
         self.image = image
         self.root = tk.Tk()
@@ -17,6 +21,13 @@ class _LoadingScreenVessel:
 
         screen_width = self.root.winfo_screenwidth()
         screen_height = self.root.winfo_screenheight()
+
+        window_width = self.root.winfo_width()
+        window_height = self.root.winfo_height()
+
+        screenWidth, screenHeight = window_width, window_height
+        screenCenter = (window_width + window_height) // 2
+
 
         x = (screen_width // 2) - (dimensions[0] // 2)
         y = (screen_height // 2) - (dimensions[1] // 2)
@@ -41,7 +52,7 @@ class _LoadingScreenVessel:
             os.chdir(os.path.dirname(os.path.abspath(__file__)))
             image = Image.open("inf.jpg")
         
-        image = image.resize((dimensions[0], dimensions[1]))
+        image = image.resize((dimensions[0], dimensions[1]), Image.Resampling.LANCZOS)
 
         photo = ImageTk.PhotoImage(image)
 
@@ -82,7 +93,7 @@ class _LoadingScreenVessel:
 
 
 class AddLoadingScreen:
-    def __init__(self, image, dimensions=(650, 390), draggable=False, cursor="wait", 
+    def __init__(self, image, dimensions=(700, 400), draggable=False, cursor="wait", 
                 fadein=True, fadein_delayms=10):
 
         self.vessel = threading.Thread(target=lambda: _LoadingScreenVessel(image, dimensions, draggable, cursor, fadein=fadein, fadein_delayms=fadein_delayms))
@@ -97,3 +108,50 @@ class AddLoadingScreen:
 
     def ChangeCursor(self, cursor=None):
         self.session.root.config(cursor="arrow" if not cursor else cursor)
+    
+    def AddText(self, text="Empty textlabel", pos=(0, 0), **args):
+        root = self.session.root
+
+        text = tk.Label(root, text=text, **args)
+        text.place(x=pos[0], y=pos[1])
+
+        return text
+
+    def AddLoadingBar(self, color="black", height=7, **args):
+        root = self.session.root
+        dimensions = self.GetScreenDimensions()
+        
+        self.lbframe = tk.Frame(root, width=0, height=height, background=color, **args)
+        self.lbframe.place(x=0, y=dimensions[1]-height)
+
+        self.progress = 0
+
+        print(dimensions[1])
+
+        return self.lbframe
+
+    def UpdateLoadingbar(self, amount):
+        self.progress_width = (self.progress / 100) * self.session.root.winfo_width()
+
+        if self.progress < 100:
+            self.progress += amount
+            self.lbframe.configure(width=self.progress_width)
+
+            print(self.progress)
+            
+
+    def GetScreenDimensions(self):
+        screen_width = self.session.root.winfo_width()
+        screen_height = self.session.root.winfo_height()
+
+        return (screen_width, screen_height)
+    
+    def GetRoot(self): return self.session.root
+
+    
+ls = AddLoadingScreen(0, dimensions=(500, 500))
+ls.AddLoadingBar("black", 5)
+
+for i in range(100):
+    time.sleep(0.1)
+    ls.UpdateLoadingbar(1)
