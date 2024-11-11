@@ -76,6 +76,8 @@ class _LoadingScreenVessel:
         self.root.geometry(f"+{x}+{y}")
 
 
+# This up here is the "vessel", basically the main program. We need two classes, one for the core, the second for handling
+# functions, threading, etc. since you can't do much after the Tkinter mainloop.
 ####################################################################
 
 
