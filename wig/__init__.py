@@ -147,11 +147,3 @@ class AddLoadingScreen:
         return (screen_width, screen_height)
     
     def GetRoot(self): return self.session.root
-
-    
-ls = AddLoadingScreen(0, dimensions=(500, 500))
-ls.AddLoadingBar("black", 5)
-
-for i in range(100):
-    time.sleep(0.1)
-    ls.UpdateLoadingbar(1)
