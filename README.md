@@ -18,4 +18,4 @@ Create modern loading screens for applications, programs, anything. Theres not m
 
 ## Known Issues
 
-As of now, WIG can't handle more than one screen in a program.
+As of now, WIG can't handle more than one screen PER program.
