@@ -8,9 +8,11 @@ screenWidth = None
 screenHeight = None
 screenCenter = None
 
+def sleep(amt): time.sleep(amt/1000)
+
 class _LoadingScreenVessel:
     def __init__(self, image, dimensions=(650, 390), draggable=False, cursor="wait", 
-                    fadein=True, fadein_delayms=10):
+                    fadein=True, fadein_delayms=10, title="Notitle"):
 
         global sessions, screenWidth, screenHeight, screenCenter
 
@@ -25,7 +27,9 @@ class _LoadingScreenVessel:
         window_width = self.root.winfo_width()
         window_height = self.root.winfo_height()
 
-        screenWidth, screenHeight = window_width, window_height
+        screenWidth = window_width,
+        screenHeight = window_height
+
         screenCenter = (window_width + window_height) // 2
 
 
@@ -94,15 +98,18 @@ class _LoadingScreenVessel:
 
 class AddLoadingScreen:
     def __init__(self, image, dimensions=(700, 400), draggable=False, cursor="wait", 
-                fadein=True, fadein_delayms=10):
+                fadein=True, fadein_delayms=10, title="Notitle"):
 
-        self.vessel = threading.Thread(target=lambda: _LoadingScreenVessel(image, dimensions, draggable, cursor, fadein=fadein, fadein_delayms=fadein_delayms))
+        self.vessel = threading.Thread(target=lambda: _LoadingScreenVessel(image, dimensions, draggable, cursor, fadein=fadein, fadein_delayms=fadein_delayms, title=title))
         self.vessel.start()
 
         time.sleep(0.25)
 
-        self.session = sessions[-1]
-    
+        try:
+            self.session = sessions[-1]
+        except IndexError:
+            raise IndexError("Fatal error: Could not find session. May be due to an error found inside _LoadScreenVessel.")
+        
     def Destroy(self):
         self.session.root.after(0, self.session.root.destroy)
 
@@ -131,13 +138,11 @@ class AddLoadingScreen:
         return self.lbframe
 
     def UpdateLoadingbar(self, amount):
-        self.progress_width = (self.progress / 100) * self.session.root.winfo_width()
+        self.progress_width = (self.progress / 100) * self.session.root.winfo_width() 
 
         if self.progress < 100:
             self.progress += amount
             self.lbframe.configure(width=self.progress_width)
-
-            print(self.progress)
             
 
     def GetScreenDimensions(self):
@@ -146,4 +151,23 @@ class AddLoadingScreen:
 
         return (screen_width, screen_height)
     
+    def GetWindowPosition(self):
+        x = self.session.root.winfo_x
+        y = self.session.root.winfo_y()
+
+        return (x, y)
+
+    def SetWindowPosition(self, x, y):
+        root = self.session.root
+        root.geometry(f"+{x}+{y}")
+
+    def MoveWindow(self, x, y):
+        p = self.GetWindowPosition()
+
+        root = self.session.root
+        root.geometry(f"+{x+p[0]}+{y+p[1]}")
+
+    def SetTitleText(self, text): self.session.root.title(text)
+    def SetDecorationMenuEnabled(self, io): self.session.root.overrideredirect(not io)
+
     def GetRoot(self): return self.session.root
