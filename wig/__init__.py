@@ -1,6 +1,17 @@
 import tkinter as tk
 from PIL import Image, ImageTk
-import time, threading, os
+import time, threading, os, colorama
+
+FC_BLUE = colorama.Fore.LIGHTBLUE_EX
+FC_RED = colorama.Fore.RED
+
+FC_RESET = colorama.Fore.RESET
+
+def logInfo(text):
+    print(FC_BLUE, f"[INFO]{FC_RESET}: {text}", FC_RESET)
+
+def logError(text):
+    print(FC_RED, f"[ERROR]{FC_RESET}: {text}", FC_RESET)
 
 sessions = []
 
@@ -55,6 +66,8 @@ class _LoadingScreenVessel:
         except:
             os.chdir(os.path.dirname(os.path.abspath(__file__)))
             image = Image.open("inf.jpg")
+
+            logInfo("Could not open specified image, resorting to default 'image not found'")
         
         image = image.resize((dimensions[0], dimensions[1]), Image.Resampling.LANCZOS)
 
@@ -72,6 +85,8 @@ class _LoadingScreenVessel:
         self.windowexit += 1
         if (self.windowexit > 2):
             self.windowexit = 0
+
+            logInfo("Exiting WIG program with code 0")
 
             self.root.destroy()
             quit()
@@ -103,15 +118,17 @@ class AddLoadingScreen:
         self.vessel = threading.Thread(target=lambda: _LoadingScreenVessel(image, dimensions, draggable, cursor, fadein=fadein, fadein_delayms=fadein_delayms, title=title))
         self.vessel.start()
 
+        logInfo("Starting WIG")
         time.sleep(0.25)
 
         try:
             self.session = sessions[-1]
         except IndexError:
-            raise IndexError("Fatal error: Could not find session. May be due to an error found inside _LoadScreenVessel.")
+            raise logError("Fatal error: Could not find session. May be due to an error found inside _LoadScreenVessel.")
         
     def Destroy(self):
         self.session.root.after(0, self.session.root.destroy)
+        logInfo("Exiting WIG program with code 0")
 
     def ChangeCursor(self, cursor=None):
         self.session.root.config(cursor="arrow" if not cursor else cursor)
